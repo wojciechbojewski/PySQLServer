@@ -7,7 +7,7 @@ from  SQLServer import database
 
 class SQLServerDatabase(unittest.TestCase):
     def test_ShowDatabases(self):
-        with sqlserver.SQLServer("DESKTOP-F1E0DKV\SQL2019","master") as engine:
+        with sqlserver.SQLServer.Login("DESKTOP-F1E0DKV\SQL2019","master") as engine:
             with engine.connect() as connection:
                 with database.Database(connection) as d:
                     result = d.ShowDatabases()
