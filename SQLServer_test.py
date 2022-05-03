@@ -1,25 +1,31 @@
+from  PySQLServer.Server import SQLServer
+
 import unittest
-from sqlalchemy import text
+class test_SQLServer(unittest.TestCase):
 
+    def test_TrustedConnection(self):
+        with SQLServer("DESKTOP-F1E0DKV\SQL2019") as sql:
+            with sql.Connect() as conn:
+                result = conn.execute("select suser_sname()")
+                self.assertEqual(result.first()[0], "DESKTOP-F1E0DKV\wojci")
 
-from  SQLServer import sqlserver
+    def test_LoginUsingCredencial(self):
+        with SQLServer("DESKTOP-F1E0DKV\SQL2019").Credentials("PublicUser","PublicUser") as sql:
+            with sql.Connect() as conn:
+                result = conn.execute("select suser_sname()")
+                self.assertEqual(result.first()[0], "PublicUser")
 
-class SQLServer(unittest.TestCase):
-    def test_DeclareSQLServerInWithStyle(self):
-        with sqlserver.SQLServer.Login("DESKTOP-F1E0DKV\SQL2019","master") as engine:
-            self.assertEqual(engine.driver, "pyodbc")
-            self.assertEqual(engine.name, "mssql")
-            with engine.connect() as connection:
-                result = connection.execute(text("select LEFT(@@version, 20)"))
-                self.assertEqual(result.first()[0], "Microsoft SQL Server")
+    def test_ShowDatabases(self):
+        with SQLServer("DESKTOP-F1E0DKV\SQL2019").Credentials("PublicUser","PublicUser") as sql:
+            with sql.Connect() as conn:
+                result = sql.ShowDatabases()
+                self.assertListEqual(result, ['master','tempdb','model','msdb','SSISDB','ContosoRetailDW','Temp'])
 
-        with sqlserver.SQLServer.Login("DESKTOP-F1E0DKV\SQL2019","master", "PublicUser", "PublicUser") as engine:
-            self.assertEqual(engine.driver, "pyodbc")
-            self.assertEqual(engine.name, "mssql")
-            with engine.connect() as connection:
-                result = connection.execute(text("select LEFT(@@version, 20)"))
-                self.assertEqual(result.first()[0], "Microsoft SQL Server")
-       
+    def test_ShowDatabasesAvaileble(self):
+        with SQLServer("DESKTOP-F1E0DKV\SQL2019").Credentials("PublicUser","PublicUser") as sql:
+            with sql.Connect() as conn:
+                result = sql.ShowDatabases(1)
+                self.assertListEqual(result, ['master','tempdb','msdb'])
 
 
 if __name__ == '__main__':

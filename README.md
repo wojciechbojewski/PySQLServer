@@ -1,2 +1,3 @@
 # PySQLServer
-Easy to use connection to SQL Server to make SQLJobs, and Unit test
+
+The goal is to map all SQL Server function like SQLJobs, running SSIS etc into class.
